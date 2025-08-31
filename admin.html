@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin | Tool Inventory</title>
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px; border: 1px solid #ccc; }
+    .out { color: red; font-weight: bold; }
+    .add-tool-container { margin: 20px 0; }
+    .add-tool-container input { padding: 5px; margin-right: 5px; }
+    .add-tool-container button { padding: 5px 10px; }
+    .remove-btn { 
+      background: red; 
+      color: white; 
+      border: none; 
+      padding: 4px 8px; 
+      cursor: pointer; 
+      border-radius: 4px; 
+    }
+    .remove-btn:hover {
+      background: darkred;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="brand">Tool&nbsp;Inventory</h2>
+    <nav>
+      <a href="admin.html" class="active">Dashboard</a>
+      <a href="Recent Activity.html" class="active">Recent Activity</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <header class="topbar">
+      <span class="admin-name">Admin</span>
+      <button class="logout-btn" onclick="window.location.href='Loginform.html'">Logout</button>
+    </header>
+
+    <!-- Add Tool -->
+    <form id="addToolForm" onsubmit="addTool(event)">      
+      <section class="add-tool-container">
+        <div class="form-row">
+          <label for="addToolName">Tool</label>
+          <input type="text" id="addToolName" style="width: 300px;" required>  
+        </div>
+        <div class="form-row">
+          <label for="addToolUnit">Unit</label>
+          <select id="addToolUnit" required>
+            <option value="">Select Unit</option>
+            <option value="pcs">pcs</option>
+            <option value="set">set</option>
+            <option value="box">box</option>
+            <option value="pack">pack</option>
+          </select>
+        </div>
+        <div class="form-row">
+            <label for="addAvailable">Available</label>
+            <input type="number" id="addAvailable" value="0" min="0" class="qtyInput">  
+        </div>
+        <div class="form-row">
+            <label for="addCheckedOut">Checked Out</label>
+            <input type="number" id="addCheckedOut" value="0" min="0" class="qtyInput">
+        </div>
+        <div class="form-row">
+            <label for="addMaintenance">For Maintenance</label>
+            <input type="number" id="addMaintenance" value="0" min="0" class="qtyInput">
+        </div>
+        <div class="form-row">
+            <label for="addBroken">Broken</label>
+            <input type="number" id="addBroken" value="0" min="0" class="qtyInput">
+        </div>
+        <div class="form-row">
+            <label for="addLost">Lost</label>
+             <input type="number" id="addLost" value="0" min="0" class="qtyInput">
+        </div>
+        <div class="form-row">
+            <label for="addDescription">Description</label>
+            <input type="text" id="addDescription" >
+        </div>
+        <div class="form-row">
+            <label for="addRemarks">Remarks</label>
+            <input type="text" id="addRemarks" >
+        </div>             
+        <button type="submit">➕ Add Tool</button>
+        <!-- <button onclick="addTool()">➕ Add Tool</button> -->
+      </section>
+    </form>    
+    <!-- Inventory Table -->
+    <section class="table-block">
+      <h3>List of Inventory</h3>
+      <table >
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tool</th>
+            <th>Available</th>
+            <th>Checked out</th>
+            <th>For Maintenance</th>
+            <th>Broken</th>
+            <th>Lost</th>
+            <th>Total</th>
+            <th>Unit</th>
+            <th>Description</th>
+            <th>Remarks</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTable">
+          <tr><td colspan="8">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    let inventory = [];
+
+    function renderEditableInventoryTable() {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const tbody = document.getElementById('inventoryTable');
+      tbody.innerHTML = '';
+      const units = ['pcs', 'set', 'box', 'pack'];
+      inventory.forEach(tool => {
+        const qty = tool.Quantity || {};
+        const available = qty.Available || 0;
+        const checkedOut = qty.CheckedOut || 0;
+        const maintenance = qty.ForMaintenance || 0;
+        const broken = qty.Broken || 0;
+        const lost = qty.Lost || 0;
+        const total = available + maintenance + broken + lost + checkedOut;
+
+        const tr = document.createElement('tr');
+        // Create options for select, pre-select current unit
+        const unitOptions = units.map(unit => 
+          `<option value="${unit}" ${tool.Unit === unit ? 'selected' : ''}>${unit}</option>`
+        ).join('');
+        tr.innerHTML = `
+          <td><strong>${tool.ID}</strong></td>
+          <td contenteditable="true" data-key="Tool">${tool.Tool}</td>          
+          <td contenteditable="true" data-key="Available">${qty.Available || 0}</td>
+          <td contenteditable="true" data-key="CheckedOut">${qty.CheckedOut || 0}</td>
+          <td contenteditable="true" data-key="ForMaintenance">${qty.ForMaintenance || 0}</td>
+          <td contenteditable="true" data-key="Broken">${qty.Broken || 0}</td>
+          <td contenteditable="true" data-key="Lost">${qty.Lost || 0}</td>
+          <td><strong>${total}</strong></td>
+          <td>
+            <select data-key="Unit">${unitOptions}</select>
+          </td>
+          <td contenteditable="true" data-key="Description">${tool.Description || ''}</td>
+          <td contenteditable="true" data-key="Remarks">${tool.Remarks || ''}</td>
+
+          <td>
+            <button onclick="saveInlineTool(${tool.ID}, this)">Save</button>
+            <button onclick="deleteTool(${tool.ID})">Delete</button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function saveInlineTool(id, btn) {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const index = inventory.findIndex(tool => tool.ID === id);
+      if (index === -1) return;
+
+      const row = btn.closest('tr');
+      const editableCells = row.querySelectorAll('[contenteditable="true"]');
+      const unitSelect = row.querySelector('select[data-key="Unit"]');
+
+      const updatedTool = {
+        ...inventory[index],
+        Quantity: {}
+      };
+
+      editableCells.forEach(cell => {
+        const key = cell.dataset.key;
+        const value = cell.textContent.trim();
+
+        if (['Available', 'CheckedOut', 'ForMaintenance', 'Broken', 'Lost'].includes(key)) {
+          updatedTool.Quantity[key] = parseInt(value) || 0;
+        } else {
+          updatedTool[key] = value;
+        }
+      });
+
+      // Get unit value from select dropdown
+      updatedTool.Unit = unitSelect.value;
+
+      inventory[index] = updatedTool;
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      alert('Tool updated!');
+      renderEditableInventoryTable();
+    }
+
+    function saveTool(id) {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const index = inventory.findIndex(tool => tool.ID === id);
+      if (index === -1) return;
+
+      const updatedTool = {
+        ...inventory[index],
+        Tool: document.getElementById(`tool-${id}`).value.trim(),
+        Unit: document.getElementById(`unit-${id}`).value.trim(),
+        Quantity: {
+          Available: parseInt(document.getElementById(`available-${id}`).value) || 0,
+          ForMaintenance: parseInt(document.getElementById(`maintenance-${id}`).value) || 0,
+          Broken: parseInt(document.getElementById(`broken-${id}`).value) || 0,
+          Lost: parseInt(document.getElementById(`lost-${id}`).value) || 0,
+        },
+        Description: document.getElementById(`desc-${id}`).value.trim(),
+        Remarks: document.getElementById(`remarks-${id}`).value.trim()
+      };
+
+      inventory[index] = updatedTool;
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      alert('Tool updated successfully.');
+      renderEditableInventoryTable();
+    }
+
+    function deleteTool(id) {
+      let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      inventory = inventory.filter(tool => tool.ID !== id);
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      renderEditableInventoryTable();
+    }   
+
+    // Load inventory from localStorage or fallback JSON file
+    function loadInventory() {
+      const localData = localStorage.getItem('inventory');
+      if (localData) {
+        inventory = JSON.parse(localData);
+        renderEditableInventoryTable();
+      } else {
+        fetch('inventory.json')
+          .then(res => res.json())
+          .then(data => {
+            inventory = data;
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            renderEditableInventoryTable();
+          })
+          .catch(err => {
+            console.error('Failed to load inventory.json:', err);
+            inventory = []; // fallback empty array
+            renderEditableInventoryTable();
+          });
+      }
+    }
+
+    function generateToolID() {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const maxID = inventory.reduce((max, t) => Math.max(max, t.ID), 0);
+      return maxID + 1;
+    }
+
+    function addTool(event) {
+      event.preventDefault(); // prevent page reload
+
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+      const newTool = {
+        ID: generateToolID(),
+        Tool: document.getElementById('addToolName').value.trim(),
+        Unit: document.getElementById('addToolUnit').value,
+        Quantity: {
+          Available: parseInt(document.getElementById('addAvailable').value) || 0,
+          CheckedOut: parseInt(document.getElementById('addCheckedOut').value) || 0,
+          ForMaintenance: parseInt(document.getElementById('addMaintenance').value) || 0,
+          Broken: parseInt(document.getElementById('addBroken').value) || 0,
+          Lost: parseInt(document.getElementById('addLost').value) || 0,
+        },
+        Description: document.getElementById('addDescription').value.trim(),
+        Remarks: document.getElementById('addRemarks').value.trim()
+      };
+
+      inventory.push(newTool);
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+      alert('Tool added successfully!');
+
+      // Clear form
+      document.getElementById('addToolForm').reset();
+
+      // Re-render table
+      renderEditableInventoryTable();
+
+      // API Adding Tool
+      // const tool = {
+      //         ID: parseInt(document.getElementById('addID').value),
+      //         Tool: document.getElementById('addTool').value,
+      //         Quantity: {
+      //           Available: parseInt(document.getElementById('addAvailable').value),
+      //           CheckedOut: parseInt(document.getElementById('addCheckedOut').value),
+      //           ForMaintenance: parseInt(document.getElementById('addMaintenance').value),
+      //           Broken: parseInt(document.getElementById('addBroken').value),
+      //           Lost: parseInt(document.getElementById('addLost').value)
+      //         },
+      //         TotalQty: parseInt(document.getElementById('addTotal').value),
+      //         Unit: document.getElementById('addUnit').value,
+      //         Description: document.getElementById('addDescription').value,
+      //         Remarks: document.getElementById('addRemarks').value
+      //       };
+      //   createTool(tool);
+
+    }
+
+    loadInventory();
+
+
+    // API CRUD
+    /*
+
+    const API_BASE = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+    async function fetchInventory() {
+      const response = await fetch(`${API_BASE}?action=read`);
+      const data = await response.json();
+      renderInventoryTable(data); // your existing render function
+    }
+
+    async function createTool(tool) {
+      await fetch(`${API_BASE}?action=create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tool)
+      });
+      fetchInventory(); // refresh table
+    }
+
+    async function updateTool(tool) {
+      await fetch(`${API_BASE}?action=update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tool)
+      });
+      fetchInventory(); // refresh
+    }
+
+    async function deleteTool(id) {
+      await fetch(`${API_BASE}?action=delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ID: id })
+      });
+      fetchInventory(); // refresh
+    }
+
+ 
+    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=read')
+      .then(res => res.json())
+      .then(data => console.log(data));
+
+
+    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=create', {
+      method: 'POST',
+      body: JSON.stringify({
+        ID: 2,
+        Tool: 'Wrench',
+        Quantity: {
+          Available: 5,
+          CheckedOut: 0,
+          ForMaintenance: 1,
+          Broken: 0,
+          Lost: 0
+        },
+        TotalQty: 6,
+        Unit: 'pcs',
+        Description: 'Adjustable wrench',
+        Remarks: ''
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=update', {
+      method: 'POST',
+      body: JSON.stringify({
+        ID: 2,
+        Tool: 'Wrench (Updated)',
+        Quantity: {
+          Available: 4,
+          CheckedOut: 1,
+          ForMaintenance: 1,
+          Broken: 0,
+          Lost: 0
+        },
+        TotalQty: 6,
+        Unit: 'pcs',
+        Description: 'Updated wrench desc',
+        Remarks: 'Used'
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=delete', {
+      method: 'POST',
+      body: JSON.stringify({ ID: 2 }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    */
+  </script>
+</body>
+</html>

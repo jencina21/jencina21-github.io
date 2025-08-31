@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tool Inventory</title>
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <!-- ✅ PHILSCA logo in top-left -->
+  <img
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_the_Philippine_State_College_of_Aeronautics.png/800px-Seal_of_the_Philippine_State_College_of_Aeronautics.png"
+    alt="PHILSCA Logo"
+    class="page-logo"
+  >
+
+  <!-- ✅ Logout Button -->
+  <div class="logout-container">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <header>
+    <h1>Tool Inventory</h1>
+  </header>
+
+  <!-- ✅ Wrapper for side-by-side tables -->
+  <div class="tables-wrapper">
+
+    <!-- ✅ Inventory Table -->
+    <section class="table-section">
+      <h3 style="text-align:center;">Current Inventory</h3>
+
+      <!-- ✅ Search bar -->
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="🔍 Search tool..." onkeyup="searchTool()" />
+      </div>
+
+      <div class="inventory-container">
+        <table id="availableToolsTable">
+          <thead>
+            <tr>
+              <th>ID</th><th>Tool</th><th>Available</th><th>Unit</th><th>Description</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ✅ Recent Activity Table -->
+    <section class="table-section">
+      <h3 style="text-align:center;">Recent Activity</h3>
+      <div class="inventory-container">
+        <table id="borrowLogsTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>ToolID</th><th>Tool</th><th>Borrowed Qty</th><th>Borrower</th><th>Date Borrow</th><th>ExpectedDate Return</th><th>Date Return</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      </div>
+    </section>
+
+  </div>
+
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div id="modal">
+    <h3>Borrow Tool</h3>
+    <div><strong>Tool:</strong> <span id="modalToolName"></span></div>
+    <input type="text" id="borrowerName" placeholder="Borrower Name" required />
+    <input type="number" id="borrowQty" placeholder="Quantity" required />
+    <input type="date" id="expectedReturn" required />
+    <button onclick="submitBorrow()">Submit</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = 'Loginform.html';
+    }
+
+    let tools = [];
+    let borrowLogs = [];
+
+    // Load tools and borrowLogs from localStorage or JSON
+    function loadData() {
+      const toolsData = localStorage.getItem('inventory');
+      tools = toolsData ? JSON.parse(toolsData) : [];
+
+      const logsData = localStorage.getItem('borrowLogs');
+      borrowLogs = logsData ? JSON.parse(logsData) : [];
+
+      tools = tools.filter(t => t.Quantity?.Available > 0);
+      renderTable();
+    }
+
+    function saveInventory() {
+      localStorage.setItem('inventory', JSON.stringify(tools));
+    }
+
+    function saveBorrowLogs() {
+      localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
+    }
+
+    let selectedTool = null;
+
+    function renderTable() {
+      const tbody = document.querySelector('#availableToolsTable tbody');
+      tbody.innerHTML = '';
+      
+      tools.forEach(tool => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${tool.ID}</td>
+          <td>${tool.Tool}</td>
+          <td>${tool.Quantity.Available}</td>
+          <td>${tool.Unit}</td>
+          <td>${tool.Description}</td>
+          <td><button onclick="openModal(${tool.ID})">Borrow</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openModal(toolId) {
+
+      const numericId = Number(toolId);
+      selectedTool = tools.find(t => t.ID == numericId);
+      if (!selectedTool) return;
+      document.getElementById('modalToolName').innerText = selectedTool.Tool;
+      document.getElementById('borrowerName').value = '';
+      document.getElementById('borrowQty').value = '';
+      document.getElementById('expectedReturn').value = '';
+      document.getElementById('modal').style.display = 'block';
+      document.getElementById('modalBackdrop').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+      document.getElementById('modalBackdrop').style.display = 'none';
+    }
+
+    function submitBorrow() {
+      const name = document.getElementById('borrowerName').value.trim();
+      const qty = Number(document.getElementById('borrowQty').value);
+      const returnDate = document.getElementById('expectedReturn').value;
+
+      if (!name || !qty || !returnDate || qty <= 0) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+
+      if (qty > selectedTool.Available) {
+        alert('Not enough tools available.');
+        return;
+      }
+
+      // Update tool quantity
+      selectedTool.Quantity -= qty;
+      if (selectedTool.Quantity === 0) {
+        selectedTool.Status = 'Checked out';
+      }
+
+      // Save updated inventory
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const toolIndex = inventory.findIndex(t => t.ID === selectedTool.ID);
+      if (toolIndex === -1 || inventory[toolIndex].Quantity.Available < qty) {
+        alert("Not enough stock.");
+        return;
+      }
+
+      inventory[toolIndex].Quantity.Available -= qty;
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+
+      // Add to BorrowLogs
+      const borrowID = borrowLogs.length ? Math.max(...borrowLogs.map(b => b.ID)) + 1 : 1;
+      borrowLogs.push({
+        ID: borrowID,
+        ToolID: selectedTool.ID,
+        Tool: selectedTool.Tool,
+        BorrowedQty: qty,
+        Borrower: name,
+        DateBorrow: new Date().toISOString().slice(0, 10),
+        ExpectedDateReturn: returnDate,
+        Status: 'Borrowed'
+      });
+      saveBorrowLogs();
+
+      alert('Tool borrowed successfully.');
+      closeModal();
+      loadData(); // re-render
+      renderBorrowLogs(); // re-render
+    }    
+
+    loadData(); // Load data on page load
+
+
+    function renderLogs(logs) {
+      const tbody = document.querySelector('#borrowLogsTable tbody');
+      tbody.innerHTML = '';
+
+      if (!logs || logs.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 8;
+        td.textContent = 'No borrow logs found.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${log.ID}</td>
+          <td>${log.ToolID}</td>
+          <td>${log.Tool}</td>
+          <td>${log.BorrowedQty}</td>
+          <td>${log.Borrower}</td>
+          <td>${log.DateBorrow || ''}</td>
+          <td>${log.ExpectedDateReturn || ''}</td>
+          <td>${log.DateReturn || ''}</td>
+          <td>${log.Status}</td>
+          <td>
+            ${log.Status === 'Borrowed' ? `<button onclick="returnTool(${log.ID})">Return</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderBorrowLogs() {
+          const localLogs = localStorage.getItem('borrowLogs');
+
+          if (localLogs) {
+            const logs = JSON.parse(localLogs);
+            renderLogs(logs);
+          } else {
+            // Fallback: Load from JSON file
+            fetch('borrowlogs.json')
+              .then(res => res.ok ? res.json() : [])
+              .then(data => {
+                renderLogs(data);
+              })
+              .catch(err => {
+                console.error('Failed to load borrowlogs.json:', err);
+                renderLogs([]);
+              });
+          }
+        }
+
+    function returnTool(borrowLogId) {
+      let borrowLogs = JSON.parse(localStorage.getItem('borrowLogs')) || [];
+      let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+      const logIndex = borrowLogs.findIndex(log => log.ID === borrowLogId);
+      if (logIndex === -1) {
+        alert('Borrow log not found.');
+        return;
+      }
+
+      const log = borrowLogs[logIndex];
+
+      if (log.Status !== 'Borrowed') {
+        alert('This tool has already been returned.');
+        return;
+      }
+
+      // Update borrow log status
+      borrowLogs[logIndex].Status = 'Returned';
+      borrowLogs[logIndex].DateReturn = new Date().toISOString().slice(0, 10); // update return date to today
+
+      // Update inventory quantity for the returned tool
+      const toolIndex = inventory.findIndex(t => t.ID === log.ToolID);
+      if (toolIndex !== -1) {
+        inventory[toolIndex].Available = (inventory[toolIndex].Available || 0) + log.BorrowedQty;
+
+        // If tool was previously checked out, change status back to 'Available' if qty > 0
+        // if (inventory[toolIndex].Available > 0) {
+        //   inventory[toolIndex].Status = 'Available';
+        // }
+      } else {
+        alert('Tool not found in inventory.');
+      }
+
+      // Save updated data back to localStorage
+      localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+
+      alert('Tool returned successfully.');
+
+      // Re-render the table
+      renderBorrowLogs();
+    }
+
+    renderBorrowLogs();
+
+    // API 
+    /*
+    async function submitBorrow(){
+      const toolID = parseInt(document.getElementById('borrowToolID').value);
+      const qty = parseInt(document.getElementById('borrowQty').value);
+      const borrower = document.getElementById('borrowerName').value.trim();
+      const expectedReturn = document.getElementById('expectedReturn').value;
+
+      // Update Inventory here if needed...
+
+      if (!name || !qty || !returnDate || qty <= 0) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+
+      if (qty > selectedTool.Available) {
+        alert('Not enough tools available.');
+        return;
+      }
+
+      // Update tool quantity
+      selectedTool.Quantity -= qty;
+      if (selectedTool.Quantity === 0) {
+        selectedTool.Status = 'Checked out';
+      }
+
+      // Save updated inventory
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const toolIndex = inventory.findIndex(t => t.ID === selectedTool.ID);
+      if (toolIndex === -1 || inventory[toolIndex].Quantity.Available < qty) {
+        alert("Not enough stock.");
+        return;
+      }
+
+      const log = {
+        ID: Date.now(), // or auto increment
+        ToolID: toolID,
+        Tool: selectedTool.Tool,
+        BorrowedQty: qty,
+        Borrower: borrower,
+        DateBorrow: new Date().toISOString().split('T')[0],
+        ExpectedReturn: expectedReturn,
+        DateReturn: '',
+        Status: 'Borrowed'
+      };
+
+      await addBorrowLog(log);
+      closeModal();
+      fetchInventory(); // update quantities
+    };
+        
+    async function addBorrowLog(log) {
+      await fetch(`${API_BASE}?action=addBorrowLog`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(log)
+      });
+    }
+
+    async function fetchBorrowLogs() {
+      const response = await fetch(`${API_BASE}?action=readBorrowLogs`);
+      const data = await response.json();
+      renderBorrowLogs(data); // render table
+    }
+
+
+    document.getElementById('borrowForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const toolID = parseInt(document.getElementById('borrowToolID').value);
+      const qty = parseInt(document.getElementById('borrowQty').value);
+      const borrower = document.getElementById('borrowerName').value.trim();
+      const expectedReturn = document.getElementById('expectedReturn').value;
+
+      // Update Inventory here if needed...
+
+      const log = {
+        ID: Date.now(), // or auto increment
+        ToolID: toolID,
+        Tool: selectedTool.Tool,
+        BorrowedQty: qty,
+        Borrower: borrower,
+        DateBorrow: new Date().toISOString().split('T')[0],
+        ExpectedReturn: expectedReturn,
+        DateReturn: '',
+        Status: 'Borrowed'
+      };
+
+      await addBorrowLog(log);
+      closeModal();
+      fetchInventory(); // update quantities
+    });
+
+    */
+
+  </script>
+
+</body>
+</html>

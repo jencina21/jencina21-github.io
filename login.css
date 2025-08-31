@@ -1,0 +1,161 @@
+/* Global Reset and Font */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body and Background */
+body {
+  background:
+    linear-gradient(rgba(236, 240, 241, 0.3), rgba(236, 240, 241, 0.3)),
+    url("https://www.philsca.edu.ph/wp-content/uploads/2021/10/IMG_0735-min-scaled.jpg") no-repeat center center fixed;
+  background-size: cover;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+  padding: 40px 0;
+  overflow: hidden;
+  animation: fadeIn 1s ease-in;
+}
+
+/* Login Box Styling */
+.login-box {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #dcdcdc;
+  backdrop-filter: blur(10px);
+  padding: 2.5rem 2.2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 50%;
+  max-width: 450px;
+  margin: 0 auto;
+  animation: fadeUp 0.7s ease-out;
+}
+
+/* Logo Styling */
+.logo {
+  width: 120px;
+  height: auto;
+  margin: 1rem auto 1.2rem;
+  display: block;
+}
+
+/* Heading */
+.login-form h2 {
+  color: #003366; /* Royal Blue */
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 0.2rem;
+}
+
+/* Subheading */
+.subtitle {
+  color: #555;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 1.8rem;
+}
+
+/* Labels */
+.login-form label {
+  display: block;
+  margin-top: 1rem;
+  color: #003366; /* Royal Blue */
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Input Fields */
+.login-form input {
+  width: 80%;
+  padding: 0.5rem;
+  margin-top: 0.4rem;
+  border: 1px solid #BDC3C7;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #FFD700; /* Gold */
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+  background-color: #fff;
+}
+
+/* Decorative Line between inputs */
+.line {
+  height: 1px;
+  background-color: #d9d9d9;
+  margin: 1rem 0 0.5rem;
+  border-radius: 4px;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, #ccc, #e1e1e1, #ccc);
+  margin: 1.2rem 0;
+}
+
+/* Login Button */
+button {
+  width: 100%;
+  padding: 0.9rem;
+  margin-top: 2rem;
+  background: linear-gradient(135deg, #FFD700, #e6c200); /* Gold gradient */
+  border: none;
+  color: #003366; /* Royal Blue text */
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Error Message */
+.error-msg {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-top: 0.8rem;
+  text-align: center;
+  display: none;
+}
+
+/* Fade animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional Footer Note */
+.footer-note {
+  color: white;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 1rem;
+  opacity: 0.8;
+}

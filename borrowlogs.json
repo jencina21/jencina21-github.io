@@ -1,0 +1,4 @@
+[
+  {"ID": 1, "ToolID": 1, "Tool": "Hammer", "BorrowedQty": 2, "Borrower": "Borrower 1", "DateBorrow": "2025-08-20", "ExpectedDateReturn": "2025-08-30", "DateReturn": "", "Status": "Borrowed"},
+  {"ID": 2, "ToolID": 2, "Tool": "Screwdriver", "BorrowedQty": 1, "Borrower": "Borrower 2", "DateBorrow": "2025-08-21", "ExpectedDateReturn": "2025-08-30", "DateReturn": "2025-08-28", "Status": "Returned"}
+]

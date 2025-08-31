@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin | Recent Activity</title>
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
+    th { background: #dbe6f1; }
+    tbody tr:nth-child(even) { background: #f9fbfd; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="brand">Tool&nbsp;Inventory</h2>
+    <nav>
+      <a href="admin.html">Dashboard</a>
+      <a href="Recent Activity.html" class="active">Recent Activity</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <header class="topbar">
+      <span class="admin-name">Admin</span>
+      <button class="logout-btn" onclick="window.location.href='Loginform.html'">Logout</button>
+    </header>
+
+    <!-- Recent Activity Table -->
+    <section class="table-block">
+      <h3>Recent Activity</h3>
+      <table id="borrowLogsTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>Tool ID</th><th>Tool</th><th>Borrowed Qty</th><th>Borrower</th><th>Date Borrow</th><th>ExpectedDate Return</th><th>Date Return</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+
+  function renderLogs(logs) {
+      const tbody = document.querySelector('#borrowLogsTable tbody');
+      tbody.innerHTML = '';
+
+      if (!logs || logs.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 8;
+        td.textContent = 'No borrow logs found.';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${log.ID}</td>
+          <td>${log.ToolID}</td>
+          <td>${log.Tool}</td>
+          <td>${log.BorrowedQty}</td>
+          <td>${log.Borrower}</td>
+          <td>${log.DateBorrow || ''}</td>
+          <td>${log.ExpectedDateReturn || ''}</td>
+          <td>${log.DateReturn || ''}</td>
+          <td>${log.Status}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderBorrowLogs(logs) {
+        const localLogs = null;
+        if (logs)
+        {
+          localLogs = logs;
+        }
+        else
+        {
+          localLogs = localStorage.getItem('borrowLogs');
+        }      
+
+        if (localLogs) {
+          const logs = JSON.parse(localLogs);
+          renderLogs(logs);
+        } else {
+          // Fallback: Load from JSON file
+          fetch('borrowlogs.json')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => {
+              renderLogs(data);
+            })
+            .catch(err => {
+              console.error('Failed to load borrowlogs.json:', err);
+              renderLogs([]);
+            });
+        }
+      }
+
+      renderBorrowLogs();
+
+      // API Code
+      // // Read BorrowLogs
+      // async function fetchBorrowLogs() {
+      //   const res = await fetch(`${API_BASE}?action=readBorrowLogs`);
+      //   const logs = await res.json();
+      //   renderBorrowLogs(logs); // your table rendering function
+      // }
+
+  </script>
+
+</body>
+</html>

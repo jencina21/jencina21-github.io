@@ -1,0 +1,22 @@
+[
+  {"ID": 1, "Tool": "Hammer", "Quantity": {
+    "Available": 8, "CheckedOut": 0,
+    "ForMaintenance": 1,
+    "Broken": 0,
+    "Lost": 1
+  },
+  "TotalQty": 10, "Unit": "pcs", "Description": "Heavy duty hammer", "Remarks": ""},
+  {"ID": 2, "Tool": "Screwdriver", "Quantity": {
+    "Available": 10,
+    "CheckedOut": 0,
+    "ForMaintenance": 0,
+    "Broken": 0,
+    "Lost": 0
+  }, "TotalQty": 10, "Unit": "pcs", "Description": "Flat head screwdriver", "Remarks": ""},
+  {"ID": 3, "Tool": "Compressor", "Quantity": {
+    "Available": 2, "CheckedOut": 0,
+    "ForMaintenance": 0,
+    "Broken": 0,
+    "Lost": 0
+  }, "TotalQty": 10, "Unit": "set", "Description": "Compressor", "Remarks": ""}
+]

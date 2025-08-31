@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tool Inventory Login</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <div class="login-box">
+    <form id="loginForm" class="login-form" autocomplete="off">
+      <h2>Tool Inventory Login</h2>
+
+      <!-- Logo -->
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_the_Philippine_State_College_of_Aeronautics.png/800px-Seal_of_the_Philippine_State_College_of_Aeronautics.png"
+        alt="Company Logo"
+        class="logo"
+      />
+
+      <p class="subtitle">Please sign in to continue</p>
+      <hr class="divider" />
+
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" required />
+
+      <div class="line"></div>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" required />
+
+      <hr class="divider" />
+
+      <button type="submit">Login</button>
+      <div id="error" class="error-msg">Invalid username or password.</div>
+    </form>
+  </div>
+
+  <script>
+
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorBox = document.getElementById('error');
+
+      // Permanent valid users
+      const accounts = [
+        { username: 'user', password: 'pwd123', role:'user', redirect: 'index.html' },
+        { username: 'admin', password: 'admin123', role: 'admin', redirect: 'admin.html' }
+      ];
+
+      const matchedAccount = accounts.find(
+        acc => acc.username === username && acc.password === password
+      );
+
+      if (matchedAccount)
+      {
+        localStorage.setItem("username", matchedAccount.username);
+        localStorage.setItem("role", matchedAccount.role);
+        if (matchedAccount.role == "admin") {
+          errorBox.style.display = 'none';
+          window.location.href = matchedAccount.redirect;
+        } 
+        else if  (matchedAccount.role == "user")
+        {
+          errorBox.style.display = 'none';
+          window.location.href = matchedAccount.redirect;
+        }         
+      }
+      else {
+        errorBox.style.display = 'block';
+        document.getElementById('password').value = '';
+      }
+    });
+
+
+    // async function initializeData() {
+    //   // Only initialize if no data in localStorage
+    //   if (!localStorage.getItem('borrowLogs')) {
+    //     try {
+    //       const res = await fetch('borrowlogs.json');
+    //       if (!res.ok) throw new Error('Failed to fetch borrowlogs.json');
+    //       const borrowLogs = await res.json();
+    //       localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
+    //       console.log('borrowLogs loaded from JSON');
+    //     } catch (err) {
+    //       console.error(err);
+    //     }
+    //   }
+
+    //   if (!localStorage.getItem('inventory')) {
+    //     try {
+    //       const res = await fetch('inventory.json');
+    //       if (!res.ok) throw new Error('Failed to fetch inventory.json');
+    //       const inventory = await res.json();
+    //       localStorage.setItem('inventory', JSON.stringify(inventory));
+    //       console.log('inventory loaded from JSON');
+    //     } catch (err) {
+    //       console.error(err);
+    //     }
+    //   }
+    // }
+
+    // // Run this on page load before rendering
+    // initializeData().then(() => {
+    //   renderBorrowLogs();
+    // });
+
+      async function initializeData() {
+      if (!localStorage.getItem('borrowLogs')) {
+        try {
+          const res = await fetch('borrowlogs.json');
+          if (!res.ok) throw new Error('Failed to fetch borrowlogs.json');
+          const borrowLogs = await res.json();
+          localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      if (!localStorage.getItem('inventory')) {
+        try {
+          const res = await fetch('inventory.json');
+          if (!res.ok) throw new Error('Failed to fetch inventory.json');
+          const inventory = await res.json();
+          localStorage.setItem('inventory', JSON.stringify(inventory));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+
+    initializeData();
+  </script>
+</body>
+</html>
