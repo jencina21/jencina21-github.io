@@ -77,15 +77,7 @@
     }
 
     function renderBorrowLogs(logs) {
-        const localLogs = null;
-        if (logs)
-        {
-          localLogs = logs;
-        }
-        else
-        {
-          localLogs = localStorage.getItem('borrowLogs');
-        }      
+        const localLogs = localStorage.getItem('borrowLogs');   
 
         if (localLogs) {
           const logs = JSON.parse(localLogs);
