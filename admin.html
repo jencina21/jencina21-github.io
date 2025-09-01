@@ -121,8 +121,9 @@
   <script>
     let inventory = [];
 
-    function renderEditableInventoryTable() {
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    function renderEditableInventoryTable(data) {
+      const inventory = JSON.parse(data.getItem('inventory')) || [];
+      // const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
       const tbody = document.getElementById('inventoryTable');
       tbody.innerHTML = '';
       const units = ['pcs', 'set', 'box', 'pack'];
@@ -165,157 +166,157 @@
       });
     }
 
-    function saveInlineTool(id, btn) {
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-      const index = inventory.findIndex(tool => tool.ID === id);
-      if (index === -1) return;
+    // function saveInlineTool(id, btn) {
+    //   const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    //   const index = inventory.findIndex(tool => tool.ID === id);
+    //   if (index === -1) return;
 
-      const row = btn.closest('tr');
-      const editableCells = row.querySelectorAll('[contenteditable="true"]');
-      const unitSelect = row.querySelector('select[data-key="Unit"]');
+    //   const row = btn.closest('tr');
+    //   const editableCells = row.querySelectorAll('[contenteditable="true"]');
+    //   const unitSelect = row.querySelector('select[data-key="Unit"]');
 
-      const updatedTool = {
-        ...inventory[index],
-        Quantity: {}
-      };
+    //   const updatedTool = {
+    //     ...inventory[index],
+    //     Quantity: {}
+    //   };
 
-      editableCells.forEach(cell => {
-        const key = cell.dataset.key;
-        const value = cell.textContent.trim();
+    //   editableCells.forEach(cell => {
+    //     const key = cell.dataset.key;
+    //     const value = cell.textContent.trim();
 
-        if (['Available', 'CheckedOut', 'ForMaintenance', 'Broken', 'Lost'].includes(key)) {
-          updatedTool.Quantity[key] = parseInt(value) || 0;
-        } else {
-          updatedTool[key] = value;
-        }
-      });
+    //     if (['Available', 'CheckedOut', 'ForMaintenance', 'Broken', 'Lost'].includes(key)) {
+    //       updatedTool.Quantity[key] = parseInt(value) || 0;
+    //     } else {
+    //       updatedTool[key] = value;
+    //     }
+    //   });
 
-      // Get unit value from select dropdown
-      updatedTool.Unit = unitSelect.value;
+    //   // Get unit value from select dropdown
+    //   updatedTool.Unit = unitSelect.value;
 
-      inventory[index] = updatedTool;
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      alert('Tool updated!');
-      renderEditableInventoryTable();
-    }
+    //   inventory[index] = updatedTool;
+    //   localStorage.setItem('inventory', JSON.stringify(inventory));
+    //   alert('Tool updated!');
+    //   renderEditableInventoryTable();
+    // }
 
-    function saveTool(id) {
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-      const index = inventory.findIndex(tool => tool.ID === id);
-      if (index === -1) return;
+    // function saveTool(id) {
+    //   const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    //   const index = inventory.findIndex(tool => tool.ID === id);
+    //   if (index === -1) return;
 
-      const updatedTool = {
-        ...inventory[index],
-        Tool: document.getElementById(`tool-${id}`).value.trim(),
-        Unit: document.getElementById(`unit-${id}`).value.trim(),
-        Quantity: {
-          Available: parseInt(document.getElementById(`available-${id}`).value) || 0,
-          ForMaintenance: parseInt(document.getElementById(`maintenance-${id}`).value) || 0,
-          Broken: parseInt(document.getElementById(`broken-${id}`).value) || 0,
-          Lost: parseInt(document.getElementById(`lost-${id}`).value) || 0,
-        },
-        Description: document.getElementById(`desc-${id}`).value.trim(),
-        Remarks: document.getElementById(`remarks-${id}`).value.trim()
-      };
+    //   const updatedTool = {
+    //     ...inventory[index],
+    //     Tool: document.getElementById(`tool-${id}`).value.trim(),
+    //     Unit: document.getElementById(`unit-${id}`).value.trim(),
+    //     Quantity: {
+    //       Available: parseInt(document.getElementById(`available-${id}`).value) || 0,
+    //       ForMaintenance: parseInt(document.getElementById(`maintenance-${id}`).value) || 0,
+    //       Broken: parseInt(document.getElementById(`broken-${id}`).value) || 0,
+    //       Lost: parseInt(document.getElementById(`lost-${id}`).value) || 0,
+    //     },
+    //     Description: document.getElementById(`desc-${id}`).value.trim(),
+    //     Remarks: document.getElementById(`remarks-${id}`).value.trim()
+    //   };
 
-      inventory[index] = updatedTool;
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      alert('Tool updated successfully.');
-      renderEditableInventoryTable();
-    }
+    //   inventory[index] = updatedTool;
+    //   localStorage.setItem('inventory', JSON.stringify(inventory));
+    //   alert('Tool updated successfully.');
+    //   renderEditableInventoryTable();
+    // }
 
-    function deleteTool(id) {
-      let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-      inventory = inventory.filter(tool => tool.ID !== id);
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      renderEditableInventoryTable();
-    }   
+    // function deleteTool(id) {
+    //   let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    //   inventory = inventory.filter(tool => tool.ID !== id);
+    //   localStorage.setItem('inventory', JSON.stringify(inventory));
+    //   renderEditableInventoryTable();
+    // }   
 
-    // Load inventory from localStorage or fallback JSON file
-    function loadInventory() {
-      const localData = localStorage.getItem('inventory');
-      if (localData) {
-        inventory = JSON.parse(localData);
-        renderEditableInventoryTable();
-      } else {
-        fetch('inventory.json')
-          .then(res => res.json())
-          .then(data => {
-            inventory = data;
-            localStorage.setItem('inventory', JSON.stringify(inventory));
-            renderEditableInventoryTable();
-          })
-          .catch(err => {
-            console.error('Failed to load inventory.json:', err);
-            inventory = []; // fallback empty array
-            renderEditableInventoryTable();
-          });
-      }
-    }
+    // // Load inventory from localStorage or fallback JSON file
+    // function loadInventory() {
+    //   const localData = localStorage.getItem('inventory');
+    //   if (localData) {
+    //     inventory = JSON.parse(localData);
+    //     renderEditableInventoryTable();
+    //   } else {
+    //     fetch('inventory.json')
+    //       .then(res => res.json())
+    //       .then(data => {
+    //         inventory = data;
+    //         localStorage.setItem('inventory', JSON.stringify(inventory));
+    //         renderEditableInventoryTable();
+    //       })
+    //       .catch(err => {
+    //         console.error('Failed to load inventory.json:', err);
+    //         inventory = []; // fallback empty array
+    //         renderEditableInventoryTable();
+    //       });
+    //   }
+    // }
 
-    function generateToolID() {
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-      const maxID = inventory.reduce((max, t) => Math.max(max, t.ID), 0);
-      return maxID + 1;
-    }
+    // function generateToolID() {
+    //   const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    //   const maxID = inventory.reduce((max, t) => Math.max(max, t.ID), 0);
+    //   return maxID + 1;
+    // }
 
-    function addTool(event) {
-      event.preventDefault(); // prevent page reload
+    // function addTool(event) {
+    //   event.preventDefault(); // prevent page reload
 
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+    //   const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
-      const newTool = {
-        ID: generateToolID(),
-        Tool: document.getElementById('addToolName').value.trim(),
-        Unit: document.getElementById('addToolUnit').value,
-        Quantity: {
-          Available: parseInt(document.getElementById('addAvailable').value) || 0,
-          CheckedOut: parseInt(document.getElementById('addCheckedOut').value) || 0,
-          ForMaintenance: parseInt(document.getElementById('addMaintenance').value) || 0,
-          Broken: parseInt(document.getElementById('addBroken').value) || 0,
-          Lost: parseInt(document.getElementById('addLost').value) || 0,
-        },
-        Description: document.getElementById('addDescription').value.trim(),
-        Remarks: document.getElementById('addRemarks').value.trim()
-      };
+    //   const newTool = {
+    //     ID: generateToolID(),
+    //     Tool: document.getElementById('addToolName').value.trim(),
+    //     Unit: document.getElementById('addToolUnit').value,
+    //     Quantity: {
+    //       Available: parseInt(document.getElementById('addAvailable').value) || 0,
+    //       CheckedOut: parseInt(document.getElementById('addCheckedOut').value) || 0,
+    //       ForMaintenance: parseInt(document.getElementById('addMaintenance').value) || 0,
+    //       Broken: parseInt(document.getElementById('addBroken').value) || 0,
+    //       Lost: parseInt(document.getElementById('addLost').value) || 0,
+    //     },
+    //     Description: document.getElementById('addDescription').value.trim(),
+    //     Remarks: document.getElementById('addRemarks').value.trim()
+    //   };
 
-      inventory.push(newTool);
-      localStorage.setItem('inventory', JSON.stringify(inventory));
-      alert('Tool added successfully!');
+    //   inventory.push(newTool);
+    //   localStorage.setItem('inventory', JSON.stringify(inventory));
+    //   alert('Tool added successfully!');
 
-      // Clear form
-      document.getElementById('addToolForm').reset();
+    //   // Clear form
+    //   document.getElementById('addToolForm').reset();
 
-      // Re-render table
-      renderEditableInventoryTable();
+    //   // Re-render table
+    //   renderEditableInventoryTable();
 
-      // API Adding Tool
-      // const tool = {
-      //         ID: parseInt(document.getElementById('addID').value),
-      //         Tool: document.getElementById('addTool').value,
-      //         Quantity: {
-      //           Available: parseInt(document.getElementById('addAvailable').value),
-      //           CheckedOut: parseInt(document.getElementById('addCheckedOut').value),
-      //           ForMaintenance: parseInt(document.getElementById('addMaintenance').value),
-      //           Broken: parseInt(document.getElementById('addBroken').value),
-      //           Lost: parseInt(document.getElementById('addLost').value)
-      //         },
-      //         TotalQty: parseInt(document.getElementById('addTotal').value),
-      //         Unit: document.getElementById('addUnit').value,
-      //         Description: document.getElementById('addDescription').value,
-      //         Remarks: document.getElementById('addRemarks').value
-      //       };
-      //   createTool(tool);
+    //   // API Adding Tool
+    //   // const tool = {
+    //   //         ID: parseInt(document.getElementById('addID').value),
+    //   //         Tool: document.getElementById('addTool').value,
+    //   //         Quantity: {
+    //   //           Available: parseInt(document.getElementById('addAvailable').value),
+    //   //           CheckedOut: parseInt(document.getElementById('addCheckedOut').value),
+    //   //           ForMaintenance: parseInt(document.getElementById('addMaintenance').value),
+    //   //           Broken: parseInt(document.getElementById('addBroken').value),
+    //   //           Lost: parseInt(document.getElementById('addLost').value)
+    //   //         },
+    //   //         TotalQty: parseInt(document.getElementById('addTotal').value),
+    //   //         Unit: document.getElementById('addUnit').value,
+    //   //         Description: document.getElementById('addDescription').value,
+    //   //         Remarks: document.getElementById('addRemarks').value
+    //   //       };
+    //   //   createTool(tool);
 
-    }
+    // }
 
-    loadInventory();
+    // loadInventory();
 
 
     // API CRUD
-    /*
+    
 
-    const API_BASE = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycby8crOoe7pXQc4zYr5IiBBRBcw265WSq3L1jdUgLmrWG89MWQySt5NU82U1WK1FOqJP2w/exec';
 
     async function fetchInventory() {
       const response = await fetch(`${API_BASE}?action=read`);
@@ -323,86 +324,86 @@
       renderInventoryTable(data); // your existing render function
     }
 
-    async function createTool(tool) {
-      await fetch(`${API_BASE}?action=create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(tool)
-      });
-      fetchInventory(); // refresh table
-    }
+    // async function createTool(tool) {
+    //   await fetch(`${API_BASE}?action=create`, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(tool)
+    //   });
+    //   fetchInventory(); // refresh table
+    // }
 
-    async function updateTool(tool) {
-      await fetch(`${API_BASE}?action=update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(tool)
-      });
-      fetchInventory(); // refresh
-    }
+    // async function updateTool(tool) {
+    //   await fetch(`${API_BASE}?action=update`, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(tool)
+    //   });
+    //   fetchInventory(); // refresh
+    // }
 
-    async function deleteTool(id) {
-      await fetch(`${API_BASE}?action=delete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ID: id })
-      });
-      fetchInventory(); // refresh
-    }
+    // async function deleteTool(id) {
+    //   await fetch(`${API_BASE}?action=delete`, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ ID: id })
+    //   });
+    //   fetchInventory(); // refresh
+    // }
 
  
-    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=read')
-      .then(res => res.json())
-      .then(data => console.log(data));
+    // fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=read')
+    //   .then(res => res.json())
+    //   .then(data => console.log(data));
 
 
-    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=create', {
-      method: 'POST',
-      body: JSON.stringify({
-        ID: 2,
-        Tool: 'Wrench',
-        Quantity: {
-          Available: 5,
-          CheckedOut: 0,
-          ForMaintenance: 1,
-          Broken: 0,
-          Lost: 0
-        },
-        TotalQty: 6,
-        Unit: 'pcs',
-        Description: 'Adjustable wrench',
-        Remarks: ''
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=create', {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     ID: 2,
+    //     Tool: 'Wrench',
+    //     Quantity: {
+    //       Available: 5,
+    //       CheckedOut: 0,
+    //       ForMaintenance: 1,
+    //       Broken: 0,
+    //       Lost: 0
+    //     },
+    //     TotalQty: 6,
+    //     Unit: 'pcs',
+    //     Description: 'Adjustable wrench',
+    //     Remarks: ''
+    //   }),
+    //   headers: { 'Content-Type': 'application/json' }
+    // });
 
-    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=update', {
-      method: 'POST',
-      body: JSON.stringify({
-        ID: 2,
-        Tool: 'Wrench (Updated)',
-        Quantity: {
-          Available: 4,
-          CheckedOut: 1,
-          ForMaintenance: 1,
-          Broken: 0,
-          Lost: 0
-        },
-        TotalQty: 6,
-        Unit: 'pcs',
-        Description: 'Updated wrench desc',
-        Remarks: 'Used'
-      }),
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=update', {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     ID: 2,
+    //     Tool: 'Wrench (Updated)',
+    //     Quantity: {
+    //       Available: 4,
+    //       CheckedOut: 1,
+    //       ForMaintenance: 1,
+    //       Broken: 0,
+    //       Lost: 0
+    //     },
+    //     TotalQty: 6,
+    //     Unit: 'pcs',
+    //     Description: 'Updated wrench desc',
+    //     Remarks: 'Used'
+    //   }),
+    //   headers: { 'Content-Type': 'application/json' }
+    // });
 
-    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=delete', {
-      method: 'POST',
-      body: JSON.stringify({ ID: 2 }),
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec?action=delete', {
+    //   method: 'POST',
+    //   body: JSON.stringify({ ID: 2 }),
+    //   headers: { 'Content-Type': 'application/json' }
+    // });
 
-    */
+    fetchInventory();
   </script>
 </body>
 </html>

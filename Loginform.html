@@ -108,31 +108,31 @@
     //   renderBorrowLogs();
     // });
 
-      async function initializeData() {
-      if (!localStorage.getItem('borrowLogs')) {
-        try {
-          const res = await fetch('borrowlogs.json');
-          if (!res.ok) throw new Error('Failed to fetch borrowlogs.json');
-          const borrowLogs = await res.json();
-          localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
-        } catch (err) {
-          console.error(err);
-        }
-      }
+      // async function initializeData() {
+      //     if (!localStorage.getItem('borrowLogs')) {
+      //       try {
+      //         const res = await fetch('borrowlogs.json');
+      //         if (!res.ok) throw new Error('Failed to fetch borrowlogs.json');
+      //         const borrowLogs = await res.json();
+      //         localStorage.setItem('borrowLogs', JSON.stringify(borrowLogs));
+      //       } catch (err) {
+      //         console.error(err);
+      //       }
+      //     }
 
-      if (!localStorage.getItem('inventory')) {
-        try {
-          const res = await fetch('inventory.json');
-          if (!res.ok) throw new Error('Failed to fetch inventory.json');
-          const inventory = await res.json();
-          localStorage.setItem('inventory', JSON.stringify(inventory));
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    }
+      //     if (!localStorage.getItem('inventory')) {
+      //       try {
+      //         const res = await fetch('inventory.json');
+      //         if (!res.ok) throw new Error('Failed to fetch inventory.json');
+      //         const inventory = await res.json();
+      //         localStorage.setItem('inventory', JSON.stringify(inventory));
+      //       } catch (err) {
+      //         console.error(err);
+      //       }
+      //     }
+      //   }
 
-    initializeData();
+    // initializeData();
   </script>
 </body>
 </html>
