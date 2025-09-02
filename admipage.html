@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Inventory</title>
+</head>
+<body>
+  <h1>Inventory Management</h1>
+  <button onclick="loadInventory()">Refresh</button>
+  <button onclick="addInventory()">Add Tool</button>
+  <table border="1" id="invTable"></table>
+
+  <script>
+    const API_URL = 'YOUR_SCRIPT_DEPLOYMENT_URL';
+
+    async function loadInventory() {
+      const res = await fetch(`${API_URL}?action=getInventory`);
+      const data = await res.json();
+
+      let html = `<tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
+      data.forEach(item => {
+        html += `<tr>${Object.values(item).map(v => `<td>${v}</td>`).join('')}
+        <td>
+          <button onclick='editItem(${JSON.stringify(item)})'>Edit</button>
+          <button onclick='deleteItem("${item.ID}")'>Delete</button>
+        </td></tr>`;
+      });
+
+      document.getElementById('invTable').innerHTML = html;
+    }
+
+    async function addInventory() {
+      const tool = prompt("Tool Name?");
+      const total = prompt("Total Quantity?");
+      const data = {
+        ID: Date.now(),
+        Tool: tool,
+        Available: total,
+        CheckedOut: 0,
+        ForMaintenance: 0,
+        Broken: 0,
+        Lost: 0,
+        TotalQty: total,
+        Unit: 'pcs',
+        Description: '',
+        Remarks: ''
+      };
+
+      await fetch(`${API_URL}?action=addInventory&data=${encodeURIComponent(JSON.stringify(data))}`);
+      loadInventory();
+    }
+
+    async function deleteItem(id) {
+      if (!confirm("Delete this item?")) return;
+      await fetch(`${API_URL}?action=deleteInventory&id=${id}`);
+      loadInventory();
+    }
+
+    async function editItem(item) {
+      const newAvailable = prompt("Available:", item.Available);
+      item.Available = newAvailable;
+
+      await fetch(`${API_URL}?action=updateInventory&data=${encodeURIComponent(JSON.stringify(item))}`);
+      loadInventory();
+    }
+
+    loadInventory();
+  </script>
+</body>
+</html>

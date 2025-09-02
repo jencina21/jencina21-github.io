@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tool Borrowing</title>
+</head>
+<body>
+  <h1>Borrow Tools</h1>
+  <div id="tools"></div>
+
+  <script>
+    const API_URL = 'YOUR_SCRIPT_DEPLOYMENT_URL';
+
+    async function loadTools() {
+      const res = await fetch(`${API_URL}?action=getInventory`);
+      const tools = await res.json();
+
+      const availableTools = tools.filter(t => parseInt(t.Available) > 0);
+      let html = '<ul>';
+      availableTools.forEach(tool => {
+        html += `<li>
+          <strong>${tool.Tool}</strong> (${tool.Available} ${tool.Unit})
+          <button onclick='borrow("${tool.ID}", "${tool.Tool}")'>Borrow</button>
+        </li>`;
+      });
+      html += '</ul>';
+      document.getElementById("tools").innerHTML = html;
+    }
+
+    async function borrow(id, name) {
+      const borrower = prompt("Your name?");
+      const qty = prompt("How many to borrow?");
+      const dateBorrow = new Date().toISOString().split('T')[0];
+      const expectedReturn = prompt("Expected return date (YYYY-MM-DD)?");
+
+      const log = {
+        ID: Date.now(),
+        ToolID: id,
+        Tool: name,
+        BorrowedQty: parseInt(qty),
+        Borrower: borrower,
+        DateBorrow: dateBorrow,
+        ExpectedDateReturn: expectedReturn,
+        DateReturn: '',
+        Status: 'Borrowed'
+      };
+
+      await fetch(`${API_URL}?action=borrowTool&data=${encodeURIComponent(JSON.stringify(log))}`);
+      alert("Tool borrowed!");
+      loadTools();
+    }
+
+    loadTools();
+  </script>
+</body>
+</html>
