@@ -1,0 +1,8 @@
+create a web application using HTML and JAVASCRIPT with the requirements. 
+1. CRUD features for admin page. 
+2. CRUD feature for updating the borrowlogs. 
+3. Repository is google sheet or excel file. 
+- Inventroy sheet columns: ID, Tool ,Available ,CheckedOut, ForMaintenance ,Broken ,Lost ,TotalQty, Unit, Description, Remarks 
+- BorrowLogs sheet columns: ID, ToolID, Tool ,BorrowedQty ,Borrower, DateBorrow ,ExpectedDateReturn, DateReturn, Status 
+4. without using the apps script of google instead use the google api to update the documents. 
+5. The document should be public so that anyone can access and update the document

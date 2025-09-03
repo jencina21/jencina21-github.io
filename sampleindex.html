@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tool Inventory Management</title>
+  <script src="script.js" defer></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 8px; }
+    table { width: 100%; margin-bottom: 20px; }
+    input, button { margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Tool Inventory - Admin Panel</h1>
+  
+  <table id="inventoryTable">
+    <thead>
+      <tr id="inventoryHeader"></tr>
+    </thead>
+    <tbody id="inventoryBody"></tbody>
+  </table>
+
+  <h2>Add New Tool</h2>
+  <div id="addToolForm"></div>
+
+  <hr/>
+
+  <h1>Borrow Logs</h1>
+
+  <table id="borrowLogsTable">
+    <thead>
+      <tr id="borrowLogsHeader"></tr>
+    </thead>
+    <tbody id="borrowLogsBody"></tbody>
+  </table>
+
+  <h2>Add Borrow Log</h2>
+  <div id="addBorrowForm"></div>
+</body>
+</html>
