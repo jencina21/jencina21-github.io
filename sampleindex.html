@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Tool Inventory Management</title>
   <script src="script.js" defer></script>
   <style>
     body { font-family: Arial; padding: 20px; }
     table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 8px; }
     table { width: 100%; margin-bottom: 20px; }
-    input, button { margin: 5px; }
+    input, button, select { margin: 5px; }
+    input[type="text"], input[type="number"], input[type="date"] { width: 150px; }
+    .filter-input { width: 200px; margin-bottom: 15px; }
+    .editable-cell { cursor: pointer; }
+    .btn { padding: 5px 10px; margin-left: 5px; }
+    .btn-delete { color: red; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>Tool Inventory - Admin Panel</h1>
-  
+  <input class="filter-input" id="filterInventory" placeholder="Filter Inventory..." />
+
   <table id="inventoryTable">
     <thead>
       <tr id="inventoryHeader"></tr>
@@ -27,6 +33,7 @@
   <hr/>
 
   <h1>Borrow Logs</h1>
+  <input class="filter-input" id="filterBorrow" placeholder="Filter Borrow Logs..." />
 
   <table id="borrowLogsTable">
     <thead>
